@@ -151,11 +151,16 @@ public class BFInterpreter implements InterpreterAPI{
 
     public static void demo() {
         BFInterpreter bf = new BFInterpreter();
+        System.out.println("Starting BFInterpreter demo (text only)...\n");
         String code = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
         String result = bf.interpret(code, null);
-        System.out.println(result); // Hello World!
-        System.out.println("Cells used: " + bf.cellsUsed);
-        System.out.println("Operations used: " + bf.operationsUsed);
+        System.out.println("Program output:");
+        System.out.print(result); // Hello World!
+        System.out.println("\nExecution Report:");
+        System.out.println("- Cells used: " + bf.cellsUsed);
+        System.out.println("- Operations used: " + bf.operationsUsed);
+        System.out.println("- Memory state: " + bf.toString());
+        System.out.println("\nBFInterpreter demo completed!");
     }
 
 }
