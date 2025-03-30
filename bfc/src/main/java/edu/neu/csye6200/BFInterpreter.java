@@ -123,7 +123,7 @@ public class BFInterpreter implements InterpreterAPI{
         try {
             interpret(code, 0);
         } catch (Exception e) {
-            output.append("Error: " + e.getMessage());
+            return "Error: " + e.getMessage() + "\n" + "Memory state when error occurred: " + toString() + "\n";
         }
         try {
             return new String(output.toString().getBytes("ISO-8859-1"), "UTF-8");
