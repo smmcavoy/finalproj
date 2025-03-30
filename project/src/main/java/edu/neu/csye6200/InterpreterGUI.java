@@ -11,7 +11,7 @@ public class InterpreterGUI {
          * Ideally, buttons should be disabled until interpreter provides output.
          * 
          * Stretch goal:
-         * - menu bar with options to save and load .bfc files.
+         * - menu bar with options to save and load .bf files.
          * 
          */
         this.interpreter = interpreter;
