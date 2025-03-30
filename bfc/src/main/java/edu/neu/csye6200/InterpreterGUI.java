@@ -1,56 +1,64 @@
 package edu.neu.csye6200;
 
+import java.util.Iterator;
+import javax.swing.*;
+
 public class InterpreterGUI {
-    public String getInput() {
+    /**
+     * TODO: Implement the GUI for the interpreter. Should have:
+     * 1. A text area for input.
+     * 2. A text area for output.
+     * 3. A button to run the interpreter.
+     * 4. A menu bar to save/load .bf files.
+     */
+    private Iterator<String> inputIterator;
+    private InterpreterAPI interpreter;
+
+    private String getInput() {
         /**
-         * TODO: Implement a method to ask the user for input.
-         * Input needs to be a SINGLE CHARACTER.
+         * TODO: Implement the method to get additional input from the user while program is running. Input should always be a single character.
          */
-        return "";
+        return ""; // Placeholder for actual input retrieval
     }
 
-    public void showOutput() {
+    private void run() {
         /**
-         * TODO: Implement a method for the interpreter to call to show output.
-         */
-    }
-
-    public void disable() {
-        /**
-         * TODO: Implement a method to disable buttons/input text area.
-         * Should also clear the contents of the output text area.
-         */
-    }
-
-    public void enable() {
-        /**
-         * TODO: Implement a method to enable buttons/input text area.
-         */
-    }
-
-    public String getTextFieldContents() {
-        /**
-         * TODO: Implement a method to return the contents of the text field.
-         */
-        return "";
-    }
-
-    public InterpreterGUI() {
-        /**
-         * TODO: Implement the GUI for the interpreter. Needs:
-         * - text area for input
-         * - a button to run the interpreter
-         * - text area for output
-         * Note: to get output of interpreter, call interpreter.run(input) and display the result in the output text area. 
-         * Ideally, buttons should be disabled until interpreter provides output.
-         * 
-         * Stretch goal:
-         * - menu bar with options to save and load .bf files.
-         * 
+         * TODO: When run button is clicked, do the following:
+         * 1. Disable buttons and input textarea.
+         * 2. Get the input from the GUI.
+         * 3. Call the interpreter with the input and the input iterator. (interpreter.run([input text area contents], inputIterator))
+         * 4. Display the output (returned by interpreter.run) in the GUI.
+         * 5. Enable buttons and input textarea again.
          */
     }
 
-    public void demo() {
-        InterpreterGUI gui = new InterpreterGUI();
+    public InterpreterGUI(InterpreterAPI interpreter) {
+        inputIterator = new Iterator<String>() {
+            @Override
+            public boolean hasNext() {
+                return true; // Always true for GUI input
+            }
+
+            @Override
+            public String next() {
+                return getInput(); // Get input from the GUI
+            }
+        };
+        this.interpreter = interpreter;
+        /**
+         * TODO: Implement the GUI layout and components.
+         */
+    }
+
+    public static void demo() {
+        // update later with actual class instance
+        InterpreterAPI interpreter = new InterpreterAPI() {
+            @Override
+            public String interpret(String input, Iterator<String> inputStream) {
+                // Placeholder for actual interpretation logic
+                return "Interpreted output"; // Placeholder for actual output
+            }
+        };
+        InterpreterGUI gui = new InterpreterGUI(interpreter);
     }
 }
