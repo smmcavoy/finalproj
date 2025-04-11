@@ -1,64 +1,85 @@
 package edu.neu.csye6200;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.Iterator;
-import javax.swing.*;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 public class InterpreterGUI {
-    /**
-     * TODO: Implement the GUI for the interpreter. Should have:
-     * 1. A text area for input.
-     * 2. A text area for output.
-     * 3. A button to run the interpreter.
-     * 4. A menu bar to save/load .bf files.
-     */
-    private Iterator<String> inputIterator;
-    private InterpreterAPI interpreter;
 
-    private String getInput() {
-        /**
-         * TODO: Implement the method to get additional input from the user while program is running. Input should always be a single character.
-         */
-        return ""; // Placeholder for actual input retrieval
+   
+    private final JFrame frame;
+
+    
+    private JTextArea inputArea;
+    private JTextArea outputArea;
+    private final JButton interpretButton;
+    private final JButton clearButton;
+
+    private InterpreterAPI interpreter = (InterpreterAPI) new BFInterpreter();
+
+    public InterpreterGUI() {
+        // Initialize the frame
+        frame = new JFrame("Brainfuck Interpreter");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+
+        // Initialize input area
+        inputArea = new JTextArea(5, 50);
+        inputArea.setLineWrap(true);
+        inputArea.setWrapStyleWord(true);
+        JScrollPane inputScroll = new JScrollPane(inputArea);
+
+        // Initialize output area
+        outputArea = new JTextArea(10, 50);
+        outputArea.setEditable(false);
+        outputArea.setLineWrap(true);
+        outputArea.setWrapStyleWord(true);
+        JScrollPane outputScroll = new JScrollPane(outputArea);
+
+        // Initialize buttons
+        interpretButton = new JButton("Interpret");
+        clearButton = new JButton("Clear");
+
+        // Panel for buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(interpretButton);
+        buttonPanel.add(clearButton);
+
+        
+        interpretButton.addActionListener((ActionEvent e) -> {
+            String code = inputArea.getText();
+            Iterator<String> dummyIterator = Arrays.asList("").iterator(); // no external input
+            String result = interpreter.interpret(code, dummyIterator);
+            outputArea.setText(result);
+        });
+
+        
+        clearButton.addActionListener(_ -> {
+            inputArea.setText("");
+            outputArea.setText("");
+        });
+
+        
+        frame.add(new JLabel("Enter Brainfuck Code Below:"), BorderLayout.NORTH);
+        frame.add(inputScroll, BorderLayout.WEST);
+        frame.add(outputScroll, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+    
+        frame.setVisible(true);
     }
 
-    private void run() {
-        /**
-         * TODO: When run button is clicked, do the following:
-         * 1. Disable buttons and input textarea.
-         * 2. Get the input from the GUI.
-         * 3. Call the interpreter with the input and the input iterator. (interpreter.run([input text area contents], inputIterator))
-         * 4. Display the output (returned by interpreter.run) in the GUI.
-         * 5. Enable buttons and input textarea again.
-         */
-    }
-
-    public InterpreterGUI(InterpreterAPI interpreter) {
-        inputIterator = new Iterator<String>() {
-            @Override
-            public boolean hasNext() {
-                return true; // Always true for GUI input
-            }
-
-            @Override
-            public String next() {
-                return getInput(); // Get input from the GUI
-            }
-        };
-        this.interpreter = interpreter;
-        /**
-         * TODO: Implement the GUI layout and components.
-         */
-    }
-
-    public static void demo() {
-        // update later with actual class instance
-        InterpreterAPI interpreter = new InterpreterAPI() {
-            @Override
-            public String interpret(String input, Iterator<String> inputStream) {
-                // Placeholder for actual interpretation logic
-                return "Interpreted output"; // Placeholder for actual output
-            }
-        };
-        InterpreterGUI gui = new InterpreterGUI(interpreter);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(InterpreterGUI::new);
     }
 }
