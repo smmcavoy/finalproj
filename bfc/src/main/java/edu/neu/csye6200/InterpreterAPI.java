@@ -1,7 +1,8 @@
 package edu.neu.csye6200;
 
-import java.util.Iterator;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public interface InterpreterAPI {
-    public String interpret(String input, Iterator<String> inputIterator);
+    public void interpret(String input, Supplier<Character> stdin, Consumer<Character> stdout) throws Exception;
 }

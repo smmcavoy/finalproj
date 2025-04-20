@@ -1,55 +1,12 @@
 package edu.neu.csye6200;
 
-import java.util.Iterator;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class BFInterpreter implements InterpreterAPI{
-    private StringBuilder output;
-    private Iterator<String> inputIterator;
-    private int cellsUsed;
     private int operationsUsed;
-    private Cell currentCell;
-    private Cell firstCell;
-    
-    private class Cell {
-        /**
-         * linked list of cells to represent the memory tape
-         * each cell has an integer value and a pointer to the next and previous cells
-         */
-        private int value;
-        private Cell next;
-        private Cell prev;
-
-        private void increment() {
-            value = (value + 1)%256;
-        }
-        private void decrement() {
-            value = (value - 1)%256;
-        }
-        private void setValue(int value) {
-            this.value = value;
-        }
-        private int getValue() {
-            return value;
-        }
-        private Cell getNext() {
-            if (next == null) {
-                next = new Cell(0);
-                cellsUsed++;
-                next.prev = this;
-            }
-            return next;
-        }
-        private Cell getPrev() throws Exception {
-            if (prev == null) {
-                throw new Exception("Script attempts to access a cell in negative memory.");
-            }
-            return prev;
-        }
-
-        private Cell(int value) {
-            this.value = value;
-        }
-    }
+    private MemoryTape memory;
+ 
 
     public static int getClosingBracketIndex(String code, int start) {
         int openBrackets = 1;
@@ -67,45 +24,49 @@ public class BFInterpreter implements InterpreterAPI{
         return -1; // No matching closing bracket found
     }
 
-    public void interpret(String code, int relativeIndex) throws Exception {
+    private void interpret(String code, int relativeIndex, Supplier<Character> stdin, Consumer<Character> stdout) throws Exception {
         int i = 0;
         while (i < code.length()) {
             char c = code.charAt(i);
 
             if (c == '>') {
-                currentCell = currentCell.getNext();
+                try {
+                    memory.cursorRight();
+                } catch (Exception e) {
+                    throw new Exception(e.getMessage() + " (index " + (relativeIndex + i) + ")");
+                }
             } else if (c == '<') {
                 try {
-                    currentCell = currentCell.getPrev();
+                    memory.cursorLeft();
                 } catch (Exception e) {
                     throw new Exception(e.getMessage() + " (index " + (relativeIndex + i) + ")");
                 }
             } else if (c == '+') {
-                currentCell.increment();
+                memory.increment();
             } else if (c == '-') {
-                currentCell.decrement();
+                memory.decrement();
             } else if (c == '.') {
-                output.append((char) currentCell.getValue());
+                Character outputChar = (char) memory.read();
+                // convert from ISO-8859-1 to utf-8
+                outputChar = new String(new byte[]{(byte) outputChar.charValue()}, 0, 1, java.nio.charset.StandardCharsets.ISO_8859_1).charAt(0);
+                stdout.accept(outputChar);
             } else if (c == '[') {
                 int closingBracketIndex = getClosingBracketIndex(code, i);
                 if (closingBracketIndex == -1) {
                     throw new Exception("Unmatched opening bracket at index " + (relativeIndex + i));
                 }
-                while (currentCell.getValue() != 0) {
-                    interpret(code.substring(i + 1, closingBracketIndex), relativeIndex + i + 1);
+                while (memory.read() != 0) {
+                    interpret(code.substring(i + 1, closingBracketIndex), relativeIndex + i + 1, stdin, stdout);
                 }
                 i = closingBracketIndex; // Move the index to the closing bracket
             } else if (c == ',') {
-                if (inputIterator.hasNext()) {
-                    String input = new String(inputIterator.next().getBytes("UTF-8"), "ISO-8859-1");
-                    if (input.length() > 0) {
-                        currentCell.setValue(input.charAt(0));
-                    } else {
-                        currentCell.setValue(0);
-                    }
-                } else {
-                    currentCell.setValue(0);
+                Character inputChar = stdin.get();
+                if (inputChar == null) {
+                    throw new Exception("Failed to read from stdin");
                 }
+                // convert from utf-8 to ISO-8859-1
+                inputChar = new String(new byte[]{(byte) inputChar.charValue()}, 0, 1, java.nio.charset.StandardCharsets.ISO_8859_1).charAt(0);
+                memory.write((int) inputChar);
             }
             operationsUsed++;
             i++;
@@ -113,54 +74,36 @@ public class BFInterpreter implements InterpreterAPI{
     }
 
     @Override
-    public String interpret(String code, Iterator<String> inputIterator) {
-        currentCell = new Cell(0);
-        firstCell = currentCell; // Keep track of the first cell
-        this.inputIterator = inputIterator;
-        output = new StringBuilder();
-        cellsUsed = 1;
+    public void interpret(String code, Supplier<Character> stdin, Consumer<Character> stdout) {
+        memory = new MemoryTape();
         operationsUsed = 0;
         try {
-            interpret(code, 0);
+            interpret(code, 0, stdin, stdout);
         } catch (Exception e) {
-            return "Error: " + e.getMessage() + "\n" + "Memory state when error occurred: " + toString() + "\n";
-        }
-        try {
-            return new String(output.toString().getBytes("ISO-8859-1"), "UTF-8");
-        }
-        catch (Exception e) {
-            return "Error: " + e.getMessage();
+            String error_msg = "\nError: " + e.getMessage() + "\n" + "Memory state when error occurred:\n" + toString() + "\n";
+            for (Character c: error_msg.toCharArray()) {
+                stdout.accept(c);
+            }
         }
     }
 
     @Override
     public String toString() {
-        StringBuilder memory = new StringBuilder();
-        for (Cell cell = firstCell; cell != null; cell = cell.next) {
-            memory.append("|"); // Start with a leading pipe for each cell
-            if (cell == currentCell) {
-
-                memory.append("*"+cell.getValue()+"*"); // Start with a leading pipe for the first cell
-            } else {
-                memory.append(cell.getValue()); // Add a space for non-current cells
-            }
-        }
-        memory.append("|");
-        return memory.toString();
+        StringBuilder s = new StringBuilder();
+        s.append("Operations used: ").append(operationsUsed).append("\n");
+        s.append("Memory state:\n").append(memory.toString()).append("\n");
+        return s.toString();
     }
+
 
     public static void demo() {
         BFInterpreter bf = new BFInterpreter();
         System.out.println("Starting BFInterpreter demo (text only)...\n");
         String code = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
-        String result = bf.interpret(code, null);
-        System.out.println("Program output:");
-        System.out.print(result); // Hello World!
-        System.out.println("\nExecution Report:");
-        System.out.println("- Cells used: " + bf.cellsUsed);
-        System.out.println("- Operations used: " + bf.operationsUsed);
-        System.out.println("- Memory state: " + bf.toString());
-        System.out.println("\nBFInterpreter demo completed!");
+        bf.interpret(code, () -> null, c -> System.out.print(c));
+        System.out.println("Execution Report:");
+        System.out.println(bf.toString());
+        System.out.println("BFInterpreter demo completed!");
     }
 
 }
