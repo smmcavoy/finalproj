@@ -8,7 +8,7 @@ public class BFInterpreter implements InterpreterAPI{
     private MemoryTape memory;
  
 
-    public static int getClosingBracketIndex(String code, int start) {
+    private static int getClosingBracketIndex(String code, int start) {
         int openBrackets = 1;
         for (int i = start + 1; i < code.length(); i++) {
             char c = code.charAt(i);
