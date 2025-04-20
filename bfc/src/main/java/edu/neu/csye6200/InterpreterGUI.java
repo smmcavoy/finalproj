@@ -86,7 +86,7 @@ public class InterpreterGUI {
             };
             Supplier<Character> stdin = () -> {
                 /**
-                 * TODO: listen for input from the user and return it as a Character.
+                 * TODO: listen for input from the user and return it as a Character. input should be entered into the 'output' textarea.
                  */  
                 return '1';              
             };
