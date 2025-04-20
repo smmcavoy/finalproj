@@ -4,5 +4,5 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public interface InterpreterAPI {
-    public void interpret(String input, Supplier<Character> stdin, Consumer<Character> stdout) throws Exception;
+    public void interpret(String input, Supplier<Character> stdin, Consumer<Character> stdout);
 }

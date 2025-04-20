@@ -95,7 +95,6 @@ public class BFInterpreter implements InterpreterAPI{
         return s.toString();
     }
 
-
     public static void demo() {
         BFInterpreter bf = new BFInterpreter();
         System.out.println("Starting BFInterpreter demo (text only)...\n");
