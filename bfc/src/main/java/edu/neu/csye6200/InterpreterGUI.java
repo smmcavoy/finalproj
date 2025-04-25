@@ -29,10 +29,10 @@ public class InterpreterGUI {
     private final JButton clearButton;
     private final JLabel statusLabel; // Status label
 
-    private InterpreterAPI interpreter ;
+    private InterpreterAPI interpreter;
 
-    public InterpreterGUI(InterpreterAPI interpreter) {
-        this.interpreter = interpreter;
+    public InterpreterGUI(InterpreterAPI interpreter_api) {
+        interpreter = interpreter_api;
         // Initialize the frame
         frame = new JFrame("BFInterpreter");
         frame.setSize(1100, 600);
