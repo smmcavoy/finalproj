@@ -2,8 +2,6 @@ package edu.neu.csye6200;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -14,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
 
 public class InterpreterGUI {
     private enum lastUsed {
@@ -26,7 +25,7 @@ public class InterpreterGUI {
 
     private JTextArea inputArea;
     private JTextArea outputArea;
-    private final JButton interpretButton;
+    private final JButton interpretButton;    
     private final JButton clearButton;
     private final JLabel statusLabel; // Status label
 
@@ -85,10 +84,23 @@ public class InterpreterGUI {
                 outputArea.append(c.toString());
             };
             Supplier<Character> stdin = () -> {
-                /**
-                 * TODO: listen for input from the user and return it as a Character. input should be entered into the 'output' textarea.
-                 */  
-                return '1';              
+                // Set status to INPUT to indicate we're expecting input
+                status = lastUsed.INPUT;
+                outputArea.append("In: "); // Add prefix for input
+                
+                // Use JOptionPane to get input from user
+                String input = JOptionPane.showInputDialog(frame, "Enter input character:", "Input Required", JOptionPane.QUESTION_MESSAGE);
+                
+                if (input == null || input.isEmpty()) {
+                    // User cancelled or entered nothing, use a default value
+                    outputArea.append("[null]");
+                    return '\0'; // Null character
+                } else {
+                    // Get the first character of the input
+                    char inputChar = input.charAt(0);
+                    outputArea.append(Character.toString(inputChar)); // Display the input
+                    return inputChar;
+                }           
             };
             String input = inputArea.getText();
             try {
