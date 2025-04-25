@@ -29,9 +29,10 @@ public class InterpreterGUI {
     private final JButton clearButton;
     private final JLabel statusLabel; // Status label
 
-    private InterpreterAPI interpreter = (InterpreterAPI) new BFInterpreter();
+    private InterpreterAPI interpreter ;
 
-    public InterpreterGUI() {
+    public InterpreterGUI(InterpreterAPI interpreter) {
+        this.interpreter = interpreter;
         // Initialize the frame
         frame = new JFrame("BFInterpreter");
         frame.setSize(1100, 600);
@@ -126,6 +127,9 @@ public class InterpreterGUI {
     }
 
     public static void demo() {
-        SwingUtilities.invokeLater(InterpreterGUI::new);
+        SwingUtilities.invokeLater(() -> {
+            InterpreterAPI interpreter = new BFInterpreter();
+            new InterpreterGUI(interpreter);
+        });
     }
 }
