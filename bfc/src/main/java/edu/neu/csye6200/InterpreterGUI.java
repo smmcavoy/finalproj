@@ -86,8 +86,14 @@ public class InterpreterGUI {
             };
             Supplier<Character> stdin = () -> {
                 // Set status to INPUT to indicate we're expecting input
-                status = lastUsed.INPUT;
-                outputArea.append("In: "); // Add prefix for input
+                if (status != lastUsed.INPUT) {
+                    if (status == lastUsed.OUTPUT) {
+                        outputArea.append("\n"); // Clear the output area before interpreting
+                    }
+                    status = lastUsed.INPUT;
+                    outputArea.append("In: "); // Add prefix for input
+                }
+
                 
                 // Use JOptionPane to get input from user
                 String input = JOptionPane.showInputDialog(frame, "Enter input character:", "Input Required", JOptionPane.QUESTION_MESSAGE);
